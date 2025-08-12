@@ -1,112 +1,93 @@
-import tkinter as tk
-from tkinter import ttk, filedialog, messagebox
 import pandas as pd
-import os
 
-class EwalletApp:
-    def __init__(self, parent):
-        self.parent = parent
-        self.frame = ttk.Frame(parent, padding=20)
-        self.frame.pack(fill="both", expand=True)
+pd.set_option('display.max_rows', None)
+pd.set_option('display.max_columns', None)
+pd.set_option('display.width', 0)
+pd.set_option('display.max_colwidth', None)
 
-        self.df = None
-        self.build_ui()
 
-    def build_ui(self):
-        ttk.Label(self.frame, text="💳 eWallet Management", font=("Segoe UI", 14, "bold")).pack(pady=(0, 10))
+# 1) Read with header on row 4 (0-based index=3) then drop rows 5 & 6
+df = pd.read_excel("E-Wallet Template.xlsx", header=3, engine="openpyxl")
+df.columns = df.columns.str.strip()
+df = df.iloc[2:].reset_index(drop=True)
+print(df)
 
-        # Instruction box
-        info_frame = ttk.LabelFrame(self.frame, text="How it works", padding=10)
-        info_frame.pack(fill="x", pady=10)
+# Case-insensitive column lookup
+cols = {c.lower(): c for c in df.columns}
+def col(name): return cols.get(name.lower())
 
-        steps = [
-            "1. Copy the eWallet file and delete all headers, subheaders, totals, etc.",
-            "2. Run the Finance Toolbox and select the eWallet tab.",
-            "3. Select the eWallet file you want to process.",
-            "4. The program will process the file and generate a summary.",
-        ]
+# 2) Date filter (keep only real dates)
+date_col = col("Date")
+df[date_col] = pd.to_datetime(df[date_col], dayfirst=True, errors="coerce")
+df = df[df[date_col].notna()].reset_index(drop=True)
 
-        for step in steps:
-            ttk.Label(info_frame, text=step, font=("Segoe UI", 9)).pack(anchor="w", padx=10, pady=2)
+# 3) Build output
+output_columns = ['TxDate','Description','Reference','Amount','UseTax','TaxType','TaxAccount','TaxAmount','Project','Account','IsDebit','SplitType','SplitGroup','Reconcile','PostDated','UseDiscount','DiscPerc','DiscTrCode','DiscDesc','UseDiscTax','DiscTaxType','DiscTaxAcc','DiscTaxAmt','PayeeName','PrintCheque','SalesRep','Module','SagePayExtra1','SagePayExtra2','SagePayExtra3']
+defaults = {'TaxType':'','TaxAccount':'','TaxAmount':0,'Project':'','IsDebit':'N','SplitType':0,'SplitGroup':0,'Reconcile':'N','PostDated':'N','UseDiscount':'N','DiscPerc':0,'DiscTrCode':'','DiscDesc':'','UseDiscTax':'N','DiscTaxType':'','DiscTaxAcc':'','DiscTaxAmt':0,'PayeeName':'','PrintCheque':'N','SalesRep':'','Module':0,'SagePayExtra1':'','SagePayExtra2':'','SagePayExtra3':''}
 
-        # File selection area
-        form = ttk.Frame(self.frame)
-        form.pack(pady=(10, 15))
 
-        ttk.Label(form, text="Select eWallet file").grid(row=0, column=0, padx=5, pady=5, sticky="w")
-        ttk.Button(form, text="📁 Browse File", command=self.process_file).grid(row=0, column=1, padx=5, pady=5)
 
-        # Output preview
-        self.filename_label = ttk.Label(self.frame, text="", foreground="blue")
-        self.filename_label.pack(pady=(10, 0))
+# Format the DataFrame
+formatted_df = pd.DataFrame(columns=output_columns)
 
-    def process_file(self):
-        try:
-            file_path = filedialog.askopenfilename(filetypes=[("Excel files", "*.xlsx;*.xls")])
-            if not file_path:
-                return
+# case-insensitive source columns
+date_c = col('Date')
+desc_c = col('Description')
+ref_c  = col('Reference')
+acct_c = col('Pastel_Acc')
+paid_c = col('Amount_paid') or col('amount_paid')
+recv_c = col('Amount_received') or col('amount_received')
+vat_c  = col('Vat(Y/N)') or col('VAT')
 
-            df = pd.read_excel(file_path)
-            if df.empty:
-                messagebox.showerror("Error", "The selected file is empty or invalid.")
-                return
+# core fields
+formatted_df['TxDate']      = df[date_c]
+formatted_df['Description'] = (df[desc_c].astype(str) if desc_c else "")
+formatted_df['Reference']   = (df[ref_c] if ref_c else "")
+formatted_df['Account']     = (df[acct_c].astype(str).str.strip() if acct_c else "")
 
-            self.df = df
-            self.filename_label.config(text=f"Processing file: {os.path.basename(file_path)}")
-            self.process_ewallet_data()
+# amounts
+idx  = df.index
+paid = pd.to_numeric(df[paid_c], errors='coerce') if paid_c else pd.Series([pd.NA]*len(idx), index=idx, dtype='float64')
+recv = pd.to_numeric(df[recv_c], errors='coerce') if recv_c else pd.Series([pd.NA]*len(idx), index=idx, dtype='float64')
+formatted_df['Amount'] = paid.where(paid.notna() & paid.ne(0), recv).fillna(0).round(2)
 
-        except Exception as e:
-            messagebox.showerror("Error", f"An error occurred while processing the file:\n{str(e)}")
+# VAT -> UseTax
+if vat_c:
+    vat_series = df[vat_c].astype(str).str.strip().str.upper().str[0]
+else:
+    vat_series = pd.Series(['N'] * len(idx), index=idx)
+formatted_df['UseTax'] = vat_series.map(lambda v: 'Y' if v == 'Y' else 'N')
 
-    def process_ewallet_data(self):
-        try:
-            df = self.df
-            if df is None or df.empty:
-                messagebox.showerror("Error", "No data loaded.")
-                return
+# date format dd/mm/yyyy
+formatted_df['TxDate'] = pd.to_datetime(formatted_df['TxDate'], dayfirst=True, errors='coerce').dt.strftime('%d/%m/%Y')
 
-            output_columns = [
-                'TxDate', 'Description', 'Reference', 'Amount', 'UseTax', 'TaxType', 'TaxAccount', 'TaxAmount',
-                'Project', 'Account', 'IsDebit', 'SplitType', 'SplitGroup', 'Reconcile', 'PostDated', 'UseDiscount',
-                'DiscPerc', 'DiscTrCode', 'DiscDesc', 'UseDiscTax', 'DiscTaxType', 'DiscTaxAcc', 'DiscTaxAmt',
-                'PayeeName', 'PrintCheque', 'SalesRep', 'Module', 'SagePayExtra1', 'SagePayExtra2', 'SagePayExtra3'
-            ]
+# fill defaults except Module/IsDebit (set below)
+for k, v in defaults.items():
+    if k not in ('Module', 'IsDebit'):
+        formatted_df[k] = v
 
-            formatted_df = pd.DataFrame(columns=output_columns)
+# Module mapping (gl->0, ap->1, ar->2)
+mod_col = next((c for c in df.columns if c.lower() in ('mymodule','module')), None)
+if mod_col:
+    mod_map = {'gl': 0, 'ap': 2, 'ar': 1}
+    formatted_df['Module'] = df[mod_col].astype(str).str.strip().str.lower().map(mod_map).fillna(0).astype(int)
+else:
+    formatted_df['Module'] = 0
 
-            formatted_df['TxDate'] = df['Date']
-            formatted_df['Description'] = df['Person_request'].astype(str) + " - " + df['Description'].astype(str)
-            formatted_df['Reference'] = df['Reference']
-            formatted_df['Amount'] = df['Amount_paid'].fillna(df['Amount_received'])
-            formatted_df['UseTax'] = df['Vat(Y/N)']
-            formatted_df['Account'] = df['Pastel_Acc']
+# IsDebit: Y if value taken from Amount_received
+mask_received = recv.notna() & recv.ne(0) & (paid.isna() | paid.eq(0))
+formatted_df['IsDebit'] = mask_received.map({True: 'Y', False: 'N'})
 
-            # Defaults
-            defaults = {
-                'TaxType': '', 'TaxAccount': '', 'TaxAmount': 0,
-                'Project': '', 'IsDebit': 'N', 'SplitType': 0, 'SplitGroup': 0,
-                'Reconcile': 'N', 'PostDated': 'N', 'UseDiscount': 'N', 'DiscPerc': 0,
-                'DiscTrCode': '', 'DiscDesc': '', 'UseDiscTax': 'N', 'DiscTaxType': '',
-                'DiscTaxAcc': '', 'DiscTaxAmt': 0, 'PayeeName': '', 'PrintCheque': 'N',
-                'SalesRep': '', 'Module': 0, 'SagePayExtra1': '', 'SagePayExtra2': '', 'SagePayExtra3': ''
-            }
+# fill missing Reference with 'DEP'
+ref_mask = formatted_df['Reference'].isna() | (formatted_df['Reference'].astype(str).str.strip() == '')
+formatted_df.loc[ref_mask, 'Reference'] = 'DEP'
 
-            for col, val in defaults.items():
-                formatted_df[col] = val
+# final order
+formatted_df = formatted_df[output_columns]
 
-            formatted_df = formatted_df[output_columns]
 
-            save_path = filedialog.asksaveasfilename(
-                defaultextension=".xlsx",
-                filetypes=[("Excel files", "*.xlsx")],
-                title="Save formatted eWallet file as"
-            )
 
-            if save_path:
-                formatted_df.to_excel(save_path, index=False)
-                messagebox.showinfo("Success", f"Formatted file saved:\n{save_path}")
-            else:
-                messagebox.showinfo("Cancelled", "Export cancelled.")
+formatted_df.to_excel("petty_import.xlsx", index=False, engine="openpyxl")
+formatted_df.to_csv("petty_import.csv", index=False, encoding="utf-8-sig")
 
-        except Exception as e:
-            messagebox.showerror("Error", f"An error occurred during processing:\n{str(e)}")
+
