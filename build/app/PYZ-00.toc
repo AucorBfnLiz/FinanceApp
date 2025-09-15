@@ -1993,6 +1993,10 @@
    'C:\\Users\\Lizelle Malan\\Aucor Programming\\Finance '
    'App\\modules\\petty_cash.py',
    'PYMODULE'),
+  ('modules.petty_transform',
+   'C:\\Users\\Lizelle Malan\\Aucor Programming\\Finance '
+   'App\\modules\\petty_transform.py',
+   'PYMODULE'),
   ('multiprocessing',
    'C:\\Users\\LizelleMalan\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\multiprocessing\\__init__.py',
    'PYMODULE'),

@@ -7,17 +7,16 @@ from modules.expenses import GLExtractorApp
 from modules.bidmasterimport import BidmasterSalesApp
 from modules.compare9500 import Compare9500App
 from modules.petty_cash import PettyCashApp
-
-
-
+# from modules.creditors import CreditorsApp   # Uncomment once you have this
 
 
 root = tk.Tk()
 root.geometry('900x650')
 root.title('Finance Automation Toolkit')
-# <-- must be before any ttk widgets
 
-
+# Define styles
+style = ttk.Style()
+style.configure("Title.TLabel", font=("Arial", 18, "bold"))
 
 # Main notebook
 notebook = ttk.Notebook(root)
@@ -28,10 +27,10 @@ welcome_frame = ttk.Frame(notebook)
 ttk.Label(welcome_frame, text="Welcome to the Finance Toolkit", style="Title.TLabel").pack(pady=20)
 notebook.add(welcome_frame, text='Welcome')
 
-# Tab 2 - Petty Cash & eWallet (nested notebook)
-central_rec = ttk.Notebook(notebook)
-PettyCashApp(central_rec)
-notebook.add(central_rec, text='EWallet_Petty Cash')
+# Tab 2 - Petty Cash & eWallet
+petty_cash_tab = ttk.Frame(notebook)
+PettyCashApp(petty_cash_tab)
+notebook.add(petty_cash_tab, text='EWallet_Petty Cash')
 
 # Tab 3 - Compare 9500
 compare9500 = ttk.Frame(notebook)
@@ -57,5 +56,10 @@ notebook.add(bidmaster, text='🧾 Bidmaster')
 gl_extract = ttk.Frame(notebook)
 GLExtractorApp(gl_extract)
 notebook.add(gl_extract, text='📂 GL Extractor')
+
+# Tab 8 - Creditors (placeholder until you create it)
+# creditors = ttk.Frame(notebook)
+# CreditorsApp(creditors)
+# notebook.add(creditors, text='📑 Creditors')
 
 root.mainloop()
