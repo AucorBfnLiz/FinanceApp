@@ -45,7 +45,7 @@ class BidmasterSalesApp:
             "4. Enter the commission percentage.",
             "5. Select the auction date.",
             "6. Click Proceed to generate the Invoice Import CSV.",
-            "7. The program will prompt for DPR and Cash Recon CSV files.",
+            "7. The program will prompt for Detailed Profit Report(CSV) and Cash Recon (CSV) files in this order.",
             "8. It will create the base invoices, commission invoices, and doc fee invoices.",
             "9. The final file will be saved as 'Inv_Invoice Import.csv' in the program folder."
         ]
@@ -148,7 +148,7 @@ class BidmasterSalesApp:
         merged_df = pd.merge(invoice_df, extracted_df[["buyer_nr", "aDescription"]], left_on="AB", right_on="buyer_nr", how="left")
         invoice_df["aDescription"] = merged_df["aDescription"].fillna("Buyer Unknown")
         invoice_df["DocType"] = "4"
-        invoice_df["AccountID"] = branch_letter + self.chosen_auction_code + "/P" + invoice_df["AB"]
+        invoice_df["AccountID"] = 'B' + self.chosen_auction_code + "/P" + invoice_df["AB"]
         invoice_df["InvDate"] = self.date
         invoice_df["TaxInclusive"] = ""
         invoice_df["OrderNum"] = invoice_df["AccountID"]
@@ -157,7 +157,7 @@ class BidmasterSalesApp:
         invoice_df["fQuantity"] = invoice_df["fQtyToProcess"] = "1"
         invoice_df["iModule"] = "1"
         invoice_df["iStockCodeID"] = ""
-        invoice_df["iLedgerAccountID"] = f"8010/{branch_gl}/{self.chosen_department_code}"
+        invoice_df["iLedgerAccountID"] = f"8010/BLM/005/{self.chosen_auction_code}"
         invoice_df["iTaxTypeID"] = "20"
         invoice_df["iWarehouseID"] = "MSTR"
         invoice_df["iPriceListNameID"] = "1"

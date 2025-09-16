@@ -1,0 +1,23 @@
+TxDate,Description,Reference,Amount,UseTax,TaxType,TaxAccount,TaxAmount,Project,Account,IsDebit
+28/08/2025,Everlytic - 03.09.2025- Amandelbult,LM012,1004.64,N,,,0,,8002/BLM/027/046,N
+26/08/2025,Everlytic - 26.08.2025 - Aucor eMalahleni,LM012,42.0,N,,,0,,8002/BLM/027/046,N
+22/08/2025,Everlytic - 28.08.2025 - Glencore 2,LM012,2006.9,N,,,0,,8002/BLM/027/046,N
+22/08/2025,Everlytic - 27.08.2025 - Glencore 1,LM012,1009.12,N,,,0,,8002/BLM/027/046,N
+21/08/2025,Everlytic - 21.08.2025 - Aucor eMalahleni,LM012,40.32,N,,,0,,8002/BLM/027/046,N
+19/08/2025,Everlytic - 19.08.2025 - Aucor eMalahleni,LM012,38.36,N,,,0,,8002/BLM/027/046,N
+18/08/2025,Everlytic - 20.08.2025 - WesBank,LM012,3464.16,N,,,0,,8002/BLM/027/046,N
+14/08/2025,Everlytic - 14.08.2025 - Aucor eMalahleni,LM012,32.76,N,,,0,,8002/BLM/027/046,N
+12/08/2025,Everlytic - 12.08.2025 - Aucor eMalahleni,LM012,36.54,N,,,0,,8002/BLM/027/046,N
+07/08/2025,Everlytic - 07.08.2025 - Aucor eMalahleni,LM012,65.52,N,,,0,,8002/BLM/027/046,N
+04/08/2025,Everlytic - 07.08.2025 - MULTI BANK,LM012,1734.74,N,,,0,,8002/BLM/027/046,N
+28/08/2025,Everlytic - 03.09.2025- Amandelbult,LM012,1004.64,N,,,0,,3020/BLM/,Y
+26/08/2025,Everlytic - 26.08.2025 - Aucor eMalahleni,LM012,42.0,N,,,0,,3020/BLM/,Y
+22/08/2025,Everlytic - 28.08.2025 - Glencore 2,LM012,2006.9,N,,,0,,3020/BLM/,Y
+22/08/2025,Everlytic - 27.08.2025 - Glencore 1,LM012,1009.12,N,,,0,,3020/BLM/,Y
+21/08/2025,Everlytic - 21.08.2025 - Aucor eMalahleni,LM012,40.32,N,,,0,,3020/BLM/,Y
+19/08/2025,Everlytic - 19.08.2025 - Aucor eMalahleni,LM012,38.36,N,,,0,,3020/BLM/,Y
+18/08/2025,Everlytic - 20.08.2025 - WesBank,LM012,3464.16,N,,,0,,3020/BLM/,Y
+14/08/2025,Everlytic - 14.08.2025 - Aucor eMalahleni,LM012,32.76,N,,,0,,3020/BLM/,Y
+12/08/2025,Everlytic - 12.08.2025 - Aucor eMalahleni,LM012,36.54,N,,,0,,3020/BLM/,Y
+07/08/2025,Everlytic - 07.08.2025 - Aucor eMalahleni,LM012,65.52,N,,,0,,3020/BLM/,Y
+04/08/2025,Everlytic - 07.08.2025 - MULTI BANK,LM012,1734.74,N,,,0,,3020/BLM/,Y

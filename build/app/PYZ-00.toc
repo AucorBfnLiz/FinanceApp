@@ -1977,6 +1977,10 @@
    'C:\\Users\\Lizelle Malan\\Aucor Programming\\Finance '
    'App\\modules\\compare9500.py',
    'PYMODULE'),
+  ('modules.everlytic',
+   'C:\\Users\\Lizelle Malan\\Aucor Programming\\Finance '
+   'App\\modules\\everlytic.py',
+   'PYMODULE'),
   ('modules.expenses',
    'C:\\Users\\Lizelle Malan\\Aucor Programming\\Finance '
    'App\\modules\\expenses.py',
